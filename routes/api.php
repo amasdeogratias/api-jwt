@@ -2,6 +2,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\QuotationController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,4 +22,11 @@ Route::group([
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
+    Route::post('/quotation/create', [QuotationController::class, 'store']);
+    Route::get('/quotation/list', [QuotationController::class, 'index']);
+    Route::get('/quotation/update/{id}', [QuotationController::class, 'update']);
 });
+
+
+
+
