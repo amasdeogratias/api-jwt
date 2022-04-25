@@ -47,15 +47,15 @@ class QuotationController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'quot_no' => 'required|string|between:2,100',
+            'quot_no' => 'required',
             'quot_date' => 'required',
-            'customer_name' => 'required|string|between:2,100',
-            'mobile' => 'required|string|between:2,100',
-            'fax' => 'required|string|between:2,100',
-            'contact_person' => 'required|string|between:2,100',
-            'country' => 'required|string|between:2,100',
-            'payment_method' => 'required|string|between:2,100',
-            'notes' => 'required|string|between:2,100',
+            'customer_name' => 'required',
+            'mobile' => 'required',
+            'fax' => 'required',
+            'contact_person' => 'required',
+            'country' => 'required',
+            'payment_method' => 'required',
+            'notes' => 'required',
         ]);
         if($validator->fails()){
             return response()->json($validator->errors()->toJson(), 400);
@@ -102,20 +102,24 @@ class QuotationController extends Controller
     public function update(Request $request, $id)
     {
         $validate = Validator::make($request->all(), [
-            'quot_no' => 'required|string|between:2,100',
+            'quot_no' => 'required',
             'quot_date' => 'required',
-            'customer_name' => 'required|string|between:2,100',
-            'mobile' => 'required|string|between:2,100',
-            'fax' => 'required|string|between:2,100',
-            'contact_person' => 'required|string|between:2,100',
-            'country' => 'required|string|between:2,100',
-            'payment_method' => 'required|string|between:2,100',
-            'notes' => 'required|string|between:2,100',
+            'customer_name' => 'required',
+            'mobile' => 'required',
+            'fax' => 'required',
+            'contact_person' => 'required',
+            'country' => 'required',
+            'payment_method' => 'required',
+            'notes' => 'required',
         ]);
         if($validate->fails()){
             return response()->json($validate->errors()->toJson(), 400);
         }
-        $quotations = Quotation::update(array_merge($validate->validated(),['quot_name'=>'required']));
+
+        $quotations = Quotation::find($id);
+        $quotations ->update(array_merge(
+            $validate->validated(),['quot_name'=>'required']));
+
         return response()->json([
             'message' =>"Quotations updated successfully...",
             'quotatio' =>$quotations,

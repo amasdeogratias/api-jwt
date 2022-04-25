@@ -101,7 +101,30 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'CustomerName' => 'required|string|between:2,100',
+            'CustomerCode' => 'required|string|between:2,100',
+            'ContactPersonName' => 'required',
+            'MobileNo' => 'required',
+            'EmailId' => 'required|string|email|max:100|unique:customers',
+            'Address' => 'required',
+            'City' => 'required',
+            'Country' => 'required',
+            'CustomerGroup' => 'required',
+
+        ]);
+        if ($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        $customer = Customer::find($id);
+        $customer -> create(array_merge(
+            $validator->validated(), ['CustomerName'=>'required']
+        ));
+        return response()->json([
+            'message' =>'Customer Details added successfully',
+            'CustomerDetails' => $customer
+        ]);
     }
 
     /**

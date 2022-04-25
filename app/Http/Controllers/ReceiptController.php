@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Item;
+use App\Models\Receipt;
 use Validator;
 
-class ItemController extends Controller
+class ReceiptController extends Controller
 {
-     /**
+    /**
      * Create a new AuthController instance.
      *
      * @return void
@@ -24,7 +24,7 @@ class ItemController extends Controller
      */
     public function index()
     {
-        return Item::all();
+        return Receipt::all();
     }
 
     /**
@@ -46,28 +46,30 @@ class ItemController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'ItemName' => 'required|string|between:2,100',
-            'ItemCode' => 'required|string|between:2,100',
-            'ItemMasterId' => 'required',
-            'ItemUnit' => 'required',
-            'ItemQty' => 'required',
-            'ItemAltUOM' => 'required',
-            'ItemFirstUOMMapping' => 'required',
-            'ItemAltUOMMapping' => 'required',
-            'ItemRate' => 'required',
-            'ItemOpeningBalance' => 'required',
-            'ItemGroup' => 'required|string|between:2, 100',
+            'ReceiptNumber' => 'required',
+            'ReceiptDate' => 'required',
+            'ReceiptTime' => 'required',
+            'PartyName' => 'required',
+            'BillNumber' => 'required',
+            'BillAmount' => 'required',
+            'DayRate' => 'required',
+            'AmountPaidInFC' => 'required',
+            'AmountPaidInDollar' => 'required',
+            'TotalAmount' => 'required',
+            'UserID' => 'required',
+            'CompanyName' => 'required',
+            'CmpGuid' => 'required',
         ]);
         if ($validator->fails()){
-            return response()->json($validator->errors()->toJson(), 400);
+            return response()->json($validator->erros()->toJson(), 400);
         }
 
-        $item = Item::create(array_merge(
-            $validator->validated(), ['ItemName'=>'required']
+        $receipt = Receipt::create(array_merge(
+            $validator->validated(), ['ReceiptNumber'=>'required']
         ));
         return response()->json([
-            'message' =>'Item Details added successfully',
-            'itemDetails' => $item
+            'message' =>'Receipt created successfully...',
+            'ReceiptDetails' => $receipt
         ]);
     }
 
@@ -103,29 +105,31 @@ class ItemController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'ItemName' => 'required|string|between:2,100',
-            'ItemCode' => 'required|string|between:2,100',
-            'ItemMasterId' => 'required',
-            'ItemUnit' => 'required',
-            'ItemQty' => 'required',
-            'ItemAltUOM' => 'required',
-            'ItemFirstUOMMapping' => 'required',
-            'ItemAltUOMMapping' => 'required',
-            'ItemRate' => 'required',
-            'ItemOpeningBalance' => 'required',
-            'ItemGroup' => 'required|string|between:2, 100',
+            'ReceiptNumber' => 'required',
+            'ReceiptDate' => 'required',
+            'ReceiptTime' => 'required',
+            'PartyName' => 'required',
+            'BillNumber' => 'required',
+            'BillAmount' => 'required',
+            'DayRate' => 'required',
+            'AmountPaidInFC' => 'required',
+            'AmountPaidInDollar' => 'required',
+            'TotalAmount' => 'required',
+            'UserID' => 'required',
+            'CompanyName' => 'required',
+            'CmpGuid' => 'required',
         ]);
         if ($validator->fails()){
-            return response()->json($validator->errors()->toJson(), 400);
+            return response()->json($validator->erros()->toJson(), 400);
         }
 
-        $item = Item:: find($id);
-        $item -> create(array_merge(
-            $validator->validated(), ['ItemName'=>'required']
+        $receipt = Receipt::find($id);
+        $receipt -> create(array_merge(
+            $validator->validated(), ['ReceiptNumber'=>'required']
         ));
         return response()->json([
-            'message' =>'Item Details added successfully',
-            'itemDetails' => $item
+            'message' =>'Receipt created successfully...',
+            'ReceiptDetails' => $receipt
         ]);
     }
 

@@ -27,7 +27,7 @@ Route::group([
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
     Route::post('/quotation/create', [QuotationController::class, 'store']);
     Route::get('/quotation/list', [QuotationController::class, 'index']);
-    Route::get('/quotation/update/{id}', [QuotationController::class, 'update']);
+    Route::post('/quotation/update/{id}', [QuotationController::class, 'update']);
     Route::post('/item/create', [ItemController::class, 'store']);
     Route::get('/item/list', [ItemController::class, 'index']);
     Route::post('/customer/create', [CustomerController::class, 'store']);
