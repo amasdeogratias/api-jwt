@@ -3,6 +3,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\CustomerController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,6 +28,10 @@ Route::group([
     Route::post('/quotation/create', [QuotationController::class, 'store']);
     Route::get('/quotation/list', [QuotationController::class, 'index']);
     Route::get('/quotation/update/{id}', [QuotationController::class, 'update']);
+    Route::post('/item/create', [ItemController::class, 'store']);
+    Route::get('/item/list', [ItemController::class, 'index']);
+    Route::post('/customer/create', [CustomerController::class, 'store']);
+    Route::get('/customer/list', [CustomerController::class, 'index']);
 });
 
 
