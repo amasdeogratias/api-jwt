@@ -63,7 +63,7 @@ class ItemController extends Controller
         }
 
         $item = Item::create(array_merge(
-            $validator->validated(), ['ItemName'=>'required']
+            $validator->validated(), $request->all()
         ));
         return response()->json([
             'message' =>'Item Details added successfully',
@@ -121,7 +121,7 @@ class ItemController extends Controller
 
         $item = Item:: find($id);
         $item -> create(array_merge(
-            $validator->validated(), ['ItemName'=>'required']
+            $validator->validated(), $request->all()
         ));
         return response()->json([
             'message' =>'Item Details added successfully',

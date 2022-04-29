@@ -65,7 +65,7 @@ class ReceiptController extends Controller
         }
 
         $receipt = Receipt::create(array_merge(
-            $validator->validated(), ['ReceiptNumber'=>'required']
+            $validator->validated(), $request->all()
         ));
         return response()->json([
             'message' =>'Receipt created successfully...',
@@ -125,7 +125,7 @@ class ReceiptController extends Controller
 
         $receipt = Receipt::find($id);
         $receipt -> create(array_merge(
-            $validator->validated(), ['ReceiptNumber'=>'required']
+            $validator->validated(), $request->all()
         ));
         return response()->json([
             'message' =>'Receipt created successfully...',

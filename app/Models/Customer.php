@@ -23,5 +23,6 @@ class Customer extends Model
         'City',
         'Country',
         'CustomerGroup',
+        'CompanyName',
     ];
 }

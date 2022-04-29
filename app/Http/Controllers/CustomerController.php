@@ -55,6 +55,7 @@ class CustomerController extends Controller
             'City' => 'required',
             'Country' => 'required',
             'CustomerGroup' => 'required',
+            'CompanyName' => 'required',
 
         ]);
         if ($validator->fails()){
@@ -62,7 +63,7 @@ class CustomerController extends Controller
         }
 
         $customer = Customer::create(array_merge(
-            $validator->validated(), ['CustomerName'=>'required']
+            $validator->validated(), $request->all()
         ));
         return response()->json([
             'message' =>'Customer Details added successfully',
@@ -119,7 +120,7 @@ class CustomerController extends Controller
 
         $customer = Customer::find($id);
         $customer -> create(array_merge(
-            $validator->validated(), ['CustomerName'=>'required']
+            $validator->validated(), $request->all()
         ));
         return response()->json([
             'message' =>'Customer Details added successfully',

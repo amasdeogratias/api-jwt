@@ -61,8 +61,7 @@ class QuotationController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
         $quotation = Quotation::create(array_merge(
-            $validator->validated(),
-            ['quot_no' => $request->quot_no]
+            $validator->validated(), $request->all()
         ));
         return response()->json([
             'message' => 'Quotations created successfully',
@@ -118,7 +117,8 @@ class QuotationController extends Controller
 
         $quotations = Quotation::find($id);
         $quotations ->update(array_merge(
-            $validate->validated(),['quot_name'=>'required']));
+            $validate->validated(), $request->all()
+        ));
 
         return response()->json([
             'message' =>"Quotations updated successfully...",

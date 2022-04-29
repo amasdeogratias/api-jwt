@@ -24,6 +24,7 @@ class CreateCustomersTable extends Migration
             $table->string('City');
             $table->string('Country');
             $table->string('CustomerGroup');
+            $table->string('CompanyName');
             $table->timestamps();
         });
     }
