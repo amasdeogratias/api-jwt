@@ -25,7 +25,7 @@ class AuthController extends Controller
     public function login(Request $request){
     	$validator = Validator::make($request->all(), [
             'username' => 'required',
-            'password' => 'required|string|min:6',
+            'PASSWORD' => 'required|string|min:6',
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -41,20 +41,53 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request) {
+        $data = file_get_contents("php://input");
+        $data_array = json_decode($data, true);
+
+        foreach($data_array['COMPANYWISEUSERSLIST'] as $key=>$value1){
+            $company = array(
+                'COMPANYNAME' => $value1['COMPANYNAME'],
+            );
+            foreach($value1['USERDETAILS'] as $key => $vl){
+                $userdetails[] = array(
+                    'COMPANYNAME' => $value1['COMPANYNAME'],
+                    "USERNAME" => $vl['USERNAME'],
+                    "MOBILELOGINSTATUS" => $vl['MOBILELOGINSTATUS'],
+                    "PASSWORD" => $vl['PASSWORD']
+                );
+                // array_push($userdetails, $userdata);
+            }
+            $output = $userdetails;
+
+        }
+        //  print_r($output);
+        // exit;
+
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|between:2,100',
-            'username' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:6',
-            'company' => 'required|string|between:2,100',
+            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.USERNAME' => 'required|string',
+            'COMPANYWISEUSERSLIST.*.COMPANYNAME' => 'required|string',
+            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.MOBILELOGINSTATUS' => 'required|string',
+            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.PASSWORD' => 'required|string',
+
         ]);
+
         if($validator->fails()){
             return response()->json($validator->errors()->toJson(), 400);
         }
+
+        foreach($output as $key => $val){
+
         $user = User::create(array_merge(
                     $validator->validated(),
-                    ['password' => bcrypt($request->password)]
+
+                    [
+                        'USERNAME'=>$val['USERNAME'],
+                        'COMPANYNAME'=>$val['COMPANYNAME'],
+                        'MOBILELOGINSTATUS'=>$val['MOBILELOGINSTATUS'],
+                        'PASSWORD' => bcrypt($request->PASSWORD)
+                    ]
                 ));
+            }
         return response()->json([
             'message' => 'User successfully registered',
             'user' => $user
