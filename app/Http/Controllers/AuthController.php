@@ -4,8 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\Rule;
+use Illuminate\Database\QueryException;
 use App\Models\User;
 use Validator;
+use JWTAuth;
+use JWTFactory;
 
 class AuthController extends Controller
 {
@@ -15,7 +21,7 @@ class AuthController extends Controller
      * @return void
      */
     public function __construct() {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'fetch']]);
     }
     /**
      * Get a JWT via given credentials.
@@ -25,13 +31,15 @@ class AuthController extends Controller
     public function login(Request $request){
     	$validator = Validator::make($request->all(), [
             'username' => 'required',
-            'PASSWORD' => 'required|string|min:6',
+            'password' => 'required|string|min:6',
+
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-        if (! $token = auth()->attempt($validator->validated())) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+
+        if (! $token = JWTAuth::attempt($validator->validated())) {
+            return response()->json(['error' => 'incorrect username or password'], 401);
         }
         return $this->createNewToken($token);
     }
@@ -53,7 +61,7 @@ class AuthController extends Controller
                     'COMPANYNAME' => $value1['COMPANYNAME'],
                     "USERNAME" => $vl['USERNAME'],
                     "MOBILELOGINSTATUS" => $vl['MOBILELOGINSTATUS'],
-                    "PASSWORD" => $vl['PASSWORD']
+                    "password" => $vl['password']
                 );
                 // array_push($userdetails, $userdata);
             }
@@ -64,10 +72,10 @@ class AuthController extends Controller
         // exit;
 
         $validator = Validator::make($request->all(), [
-            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.USERNAME' => 'required|string',
+            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.USERNAME' => 'required|unique:users,USERNAME,except,id',
             'COMPANYWISEUSERSLIST.*.COMPANYNAME' => 'required|string',
             'COMPANYWISEUSERSLIST.*.USERDETAILS.*.MOBILELOGINSTATUS' => 'required|string',
-            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.PASSWORD' => 'required|string',
+            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.password' => 'required|string|confirmed|min:6',
 
         ]);
 
@@ -84,7 +92,7 @@ class AuthController extends Controller
                         'USERNAME'=>$val['USERNAME'],
                         'COMPANYNAME'=>$val['COMPANYNAME'],
                         'MOBILELOGINSTATUS'=>$val['MOBILELOGINSTATUS'],
-                        'PASSWORD' => bcrypt($request->PASSWORD)
+                        'password' => Hash::make($vl['password'])
                     ]
                 ));
             }
@@ -130,8 +138,74 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
+            'expires_in' => JWTFactory::getTTL() * 60,
             'user' => auth()->user()
         ]);
+    }
+
+    public function fetch()
+    {
+        try {
+            $response = Http::get('http://192.168.30.126:8080/api/TallyUsers');
+        $output = json_decode($response->body(), true);
+        $output = (array) $output;
+        $arr = json_decode($output[0], true);
+        // echo json_encode($arr['COMPANYWISEUSERSLIST']);
+        // exit;
+        foreach($arr['COMPANYWISEUSERSLIST'] as $key => $values){
+            foreach($values['USERDETAILS'] as $key => $vl){
+                $outputValues[] = array(
+                    'COMPANYNAME' => $values['COMPANYNAME'],
+                    "USERNAME" => $vl['USERNAME'],
+                    "MOBILELOGINSTATUS" => $vl['MOBILELOGINSTATUS'],
+                    "password" => '123456',
+                );
+            }
+            $output_data = $outputValues;
+        }
+        // print_r($output_data);
+        // exit;
+
+        $validator = Validator::make($output_data, [
+            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.USERNAME' => [
+                'required',
+                Rule::unique('users'),
+            ],
+            'COMPANYWISEUSERSLIST.*.COMPANYNAME' => 'required|string',
+            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.MOBILELOGINSTATUS' => 'required|string',
+            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.password' => 'required|string|confirmed|min:6',
+
+        ]);
+        // print_r($validator);
+        // exit;
+
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+
+        foreach($output_data as $key => $val)
+        {
+            $user = User::create(array_merge(
+                $validator->validated(),
+
+                [
+                    'USERNAME'=>$val['USERNAME'],
+                    'COMPANYNAME'=>$val['COMPANYNAME'],
+                    'MOBILELOGINSTATUS'=>$val['MOBILELOGINSTATUS'],
+                    'password' => Hash::make(123456)
+                ]
+            ));
+        }
+        return response()->json([
+            'message' => 'Successfully synchronized...'
+
+        ], 201);
+
+        }catch(\Exception $exception){
+            return response(array(
+                "code"=> 409,
+                "error"=>"Username is already taken, please create different user"));
+        }
     }
 }

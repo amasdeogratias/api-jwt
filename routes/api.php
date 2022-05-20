@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ChangePasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,8 @@ Route::group([
     Route::get('/item/list', [ItemController::class, 'index']);
     Route::post('/customer/create', [CustomerController::class, 'store']);
     Route::get('/customer/list', [CustomerController::class, 'index']);
+    Route::post('/change-password', [ChangePasswordController::class, 'store']);
+    Route::get('/fetch', [AuthController::class, 'fetch']);
 });
 
 
