@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Rule;
-use Illuminate\Database\QueryException;
+use Exception;
 use App\Models\User;
 use Validator;
 use JWTAuth;
@@ -145,14 +145,13 @@ class AuthController extends Controller
 
     public function fetch()
     {
-        try {
-            $response = Http::get('http://192.168.30.126:8080/api/TallyUsers');
-        $output = json_decode($response->body(), true);
-        $output = (array) $output;
+        $response = Http::get('http://192.168.30.126:8080/api/TallyUsers');
+        $result = json_decode($response->body(), true);
+        $output = (array) $result;
         $arr = json_decode($output[0], true);
-        // echo json_encode($arr['COMPANYWISEUSERSLIST']);
-        // exit;
-        foreach($arr['COMPANYWISEUSERSLIST'] as $key => $values){
+    //    echo json_encode(array_values($arr['COMPANYWISEUSERSLIST']['USERDETAILS']));
+    //     exit;
+        foreach($arr as $key => $values){
             foreach($values['USERDETAILS'] as $key => $vl){
                 $outputValues[] = array(
                     'COMPANYNAME' => $values['COMPANYNAME'],
@@ -163,49 +162,49 @@ class AuthController extends Controller
             }
             $output_data = $outputValues;
         }
+
         // print_r($output_data);
         // exit;
 
-        $validator = Validator::make($output_data, [
-            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.USERNAME' => [
-                'required',
-                Rule::unique('users'),
-            ],
-            'COMPANYWISEUSERSLIST.*.COMPANYNAME' => 'required|string',
-            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.MOBILELOGINSTATUS' => 'required|string',
-            'COMPANYWISEUSERSLIST.*.USERDETAILS.*.password' => 'required|string|confirmed|min:6',
-
-        ]);
-        // print_r($validator);
-        // exit;
-
-        if($validator->fails()){
-            return response()->json($validator->errors()->toJson(), 400);
-        }
-
-
-        foreach($output_data as $key => $val)
+        try
         {
-            $user = User::create(array_merge(
-                $validator->validated(),
+            $validator = Validator::make($output_data, [
+                'COMPANYWISEUSERSLIST.*.USERDETAILS.*.USERNAME' => [
+                    'required',
+                    Rule::unique('users'),
+                ],
+                'COMPANYWISEUSERSLIST.*.COMPANYNAME' => 'required|string',
+                'COMPANYWISEUSERSLIST.*.USERDETAILS.*.MOBILELOGINSTATUS' => 'required|string',
+                'COMPANYWISEUSERSLIST.*.USERDETAILS.*.password' => 'required|string|confirmed|min:6',
 
-                [
-                    'USERNAME'=>$val['USERNAME'],
-                    'COMPANYNAME'=>$val['COMPANYNAME'],
-                    'MOBILELOGINSTATUS'=>$val['MOBILELOGINSTATUS'],
-                    'password' => Hash::make(123456)
-                ]
-            ));
+            ]);
+
+            if($validator->fails()){
+                return response()->json($validator->errors()->toJson(), 400);
+            }
+
+
+            foreach($output_data as $key => $val)
+            {
+                $user = User::create(array_merge(
+                    $validator->validated(),
+
+                    [
+                        'USERNAME'=>$val['USERNAME'],
+                        'COMPANYNAME'=>$val['COMPANYNAME'],
+                        'MOBILELOGINSTATUS'=>$val['MOBILELOGINSTATUS'],
+                        'password' => Hash::make(123456)
+                    ]
+                ));
+            }
+        }catch (\Exception $exception){
+            return response()->json([
+                'message' => 'Duplicates entry for username, create new user'
+            ]);
         }
         return response()->json([
             'message' => 'Successfully synchronized...'
 
         ], 201);
-
-        }catch(\Exception $exception){
-            return response(array(
-                "code"=> 409,
-                "error"=>"Username is already taken, please create different user"));
-        }
     }
 }

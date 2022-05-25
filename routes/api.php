@@ -33,6 +33,7 @@ Route::group([
     Route::get('/item/list', [ItemController::class, 'index']);
     Route::post('/customer/create', [CustomerController::class, 'store']);
     Route::get('/customer/list', [CustomerController::class, 'index']);
+    Route::get('/customer/tally', [CustomerController::class, 'tallyCustomer']);
     Route::post('/change-password', [ChangePasswordController::class, 'store']);
     Route::get('/fetch', [AuthController::class, 'fetch']);
 });

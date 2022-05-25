@@ -14,15 +14,16 @@ class Customer extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'CustomerName',
-        'CustomerCode',
-        'ContactPersonName',
-        'MobileNo',
-        'EmailId',
-        'Address',
-        'City',
-        'Country',
-        'CustomerGroup',
-        'CompanyName',
+        'CUSTOMERNAME',
+        'CUSTOMERCODE',
+        'CONTACTPERSONNAME',
+        'MOBILENO',
+        'EMAILID',
+        'ADDRESS',
+        'CITY',
+        'COUNTRY',
+        'CUSTOMERGROUP',
+        'COMPANYNAME',
+
     ];
 }
