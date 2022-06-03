@@ -199,6 +199,7 @@ class AuthController extends Controller
             }
         }catch (\Exception $exception){
             return response()->json([
+                'code' =>409,
                 'message' => 'Duplicates entry for username, create new user'
             ]);
         }

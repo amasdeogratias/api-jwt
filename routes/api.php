@@ -6,6 +6,7 @@ use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ChangePasswordController;
+use App\Http\Controllers\InvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,7 @@ Route::group([
     Route::get('/customer/tally', [CustomerController::class, 'tallyCustomer']);
     Route::post('/change-password', [ChangePasswordController::class, 'store']);
     Route::get('/fetch', [AuthController::class, 'fetch']);
+    Route::post('/create/invoice', [InvoiceController::class, 'createInvoice']);
 });
 
 

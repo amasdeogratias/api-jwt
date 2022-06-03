@@ -135,7 +135,7 @@ class CustomerController extends Controller
         {
             $validata = Validator::make($output_data, [
                 'CUSOMTERDETAILS.*.CUSTOMERNAME' => 'required|unique:customers',
-                'CUSOMTERDETAILS.*.CUSTOMERCODE' => 'required|unique:customers',
+                'CUSOMTERDETAILS.*.CUSTOMERCODE' => 'required',
                 'CUSOMTERDETAILS.*.CONTACTPERSONNAME' => 'required',
                 'CUSOMTERDETAILS.*.MOBILENO' => 'required',
                 'CUSOMTERDETAILS.*.EMAILID' => 'required',
